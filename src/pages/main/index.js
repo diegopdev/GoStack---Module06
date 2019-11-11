@@ -1,23 +1,94 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Keyboard, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import api from '../../services/api';
 
-import { Container, Form, Input, Submit } from './styled';
+import {
+  Container,
+  Form,
+  Input,
+  Submit,
+  List,
+  User,
+  Name,
+  Bio,
+  Avatar,
+  ProfileButton,
+  ProfileButtonText,
+} from './styled';
 
-export default function Main() {
-  return (
-    <Container>
-      <Form>
-        <Input
-          autoCorrect={false}
-          autoCapitalize="none"
-          placeholder="Adicionar usuario"
+export default class Main extends Component {
+  state = {
+    newUser: '',
+    users: [],
+    loading: false,
+  };
+
+  handleAddUser = async () => {
+    const { users, newUser } = this.state;
+
+    this.setState({ loading: true });
+
+    const response = await api.get(`/users/${newUser}`);
+
+    const data = {
+      name: response.data.name,
+      login: response.data.login,
+      bio: response.data.bio,
+      avatar: response.data.avatar_url,
+    };
+
+    this.setState({
+      users: [...users, data],
+      newUser: '',
+    });
+
+    this.setState({ loading: false });
+
+    Keyboard.dismiss();
+  };
+
+  render() {
+    const { newUser, users, loading } = this.state;
+
+    return (
+      <Container>
+        <Form>
+          <Input
+            autoCorrect={false}
+            autoCapitalize="none"
+            placeholder="Adicionar usuario"
+            value={newUser}
+            returnKeyType="send"
+            onSubmitEditing={this.handleAddUser}
+            onChangeText={text => this.setState({ newUser: text })}
+          />
+          <Submit loading={loading} onPress={this.handleAddUser}>
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Icon name="add" size={20} color="#fff" />
+            )}
+          </Submit>
+        </Form>
+        <List
+          data={users}
+          keyExtractor={user => user.login}
+          renderItem={({ item }) => (
+            <User>
+              <Avatar source={{ uri: item.avatar }} />
+              <Name>{item.name}</Name>
+              <Bio>{item.bio}</Bio>
+
+              <ProfileButton onPress={() => {}}>
+                <ProfileButtonText>Ver Perfil</ProfileButtonText>
+              </ProfileButton>
+            </User>
+          )}
         />
-        <Submit>
-          <Icon name="add" size={20} color="#fff" />
-        </Submit>
-      </Form>
-    </Container>
-  );
+      </Container>
+    );
+  }
 }
 
 Main.navigationOptions = {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
 
+import './config/configReactotron';
 import Routes from './routes';
 
 const App = () => {
