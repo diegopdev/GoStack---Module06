@@ -36,7 +36,7 @@ export const Avatar = styled.Image`
 `;
 
 export const Stars = styled.FlatList.attrs({
-  showsVerticalScorllIndicator: false,
+  showsVerticalScrollIndicator: false,
 })`
   margin-top: 20px;
 `;
